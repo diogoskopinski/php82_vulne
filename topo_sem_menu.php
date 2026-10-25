@@ -32,16 +32,6 @@ $count = mysql_num_rows($sql);
     <link href="css/sb-admin.css" rel="stylesheet">
     <link rel="stylesheet" href="css/colorbox.css" />
 
-<!-- Botao pesquisa -->
-<script language="JavaScript" src="js/shortcut.js"></script>
-<script>
-shortcut.add("F9",function()
-{
-	 document.consulta.consulta.focus();
-});
-</script>
-<!-- Final botao pesquisa-->
-
   </head>
 
   <body>

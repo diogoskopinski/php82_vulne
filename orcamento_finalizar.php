@@ -1,69 +1,82 @@
-	<?php require("topo.php");
-	require ("functions.php");
-	?>
+<?php
 
-	 <?php
-		session_start();
-		if(isset($_GET['cliente'])){
-			$idCliente = $_GET['cliente'];
-			// VERIFICAR SE EXISTE UMA SESSION
-			if($_SESSION){
-				//OBTER PROXIMO ORÇAMENTO
-				$sql = mysql_query("SELECT idOrcamento FROM orcamento ORDER BY idOrcamento DESC LIMIT 1");
-				if($res=mysql_fetch_array($sql)){
-					$idOrcamento = $res[0] + 1;
-				}
-				else{
-					$idOrcamento = 1;
-				}
+require_once __DIR__ . '/bootstrap.php';
 
-				foreach($_SESSION['produto'] as $id => $campo ){
-					if($campo['id'] > 0){
-						$id = $campo['id'];
-						$preco = $campo['preco'];
-						$quantidade = $campo['quantidade'];
-						mysql_query("INSERT INTO orcamento (idProduto, idOrcamento, idCliente, preco, quantidade, dataHora) VALUES ('$id', '$idOrcamento', '$idCliente', '$preco', '$quantidade', now())");
-						$_SESSION['produto']['id_' . $id]['id'] = '0';
-					}
-				}
-			}
-		}
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 
-		//$alterar = "UPDATE produtos SET estoque=estoque-'$quantidade' WHERE id = '$id'";
-		//mysql_query($alterar) or die(mysql_error());
-	?>
-	<div class="row">
-	          <div class="col-lg-12">
-	              <ol class="breadcrumb">
-	              <li class="active"><i class="fa fa-dashboard"></i> Dashboard</li>
-	            </ol>
-	          </div>
-	        </div><!-- /.row -->
+require_once __DIR__ . '/functions.php';
 
+$idOrcamento = null;
+$salvo = false;
 
-	<div class="col-lg-12">
-	         <div class="alert alert-dismissable alert-success">
-	         <button type="button" class="close" data-dismiss="alert">&times;</button>
-	         <strong>Feito!</strong> You successfully read <a href="#" class="alert-link">Orçamento salvo com sucesso</a>.
-	         </div>
+$clienteId = isset($_POST['cliente']) ? (int) $_POST['cliente'] : (isset($_GET['cliente']) ? (int) $_GET['cliente'] : 0);
 
+if ($clienteId > 0 && !empty($_SESSION['produto']) && is_array($_SESSION['produto'])) {
+    $sql = mysql_query('SELECT idOrcamento FROM orcamento ORDER BY idOrcamento DESC LIMIT 1');
+    if ($res = mysql_fetch_array($sql)) {
+        $idOrcamento = (int) $res[0] + 1;
+    } else {
+        $idOrcamento = 1;
+    }
 
-	         <script>
-		 var width = 595;
-		 var height = 421;
-		 var left = 0;
-		 var top = 0;
-		 var url = "orcamento_visualizar.php?idOrcamento=<?php echo $idOrcamento?>";
-		 window.open(url,'janela', 'width='+width+', height='+height+', top='+top+', left='+left+', scrollbars=yes, status=no, toolbar=no, location=no, directories=no, menubar=no, resizable=no, fullscreen=no');
-	</script>
+    foreach ($_SESSION['produto'] as $campo) {
+        if (empty($campo['id']) || (int) $campo['id'] <= 0) {
+            continue;
+        }
+        $id = (int) $campo['id'];
+        $preco = mysql_real_escape_string((string) $campo['preco']);
+        $quantidade = (int) $campo['quantidade'];
+        $clienteEsc = mysql_real_escape_string((string) $clienteId);
+        $orcEsc = mysql_real_escape_string((string) $idOrcamento);
 
-	<!-- JavaScript -->
-	    <script src="js/jquery-1.10.2.js"></script>
-	    <script src="js/bootstrap.js"></script>
+        mysql_query(
+            "INSERT INTO orcamento (idProduto, idOrcamento, idCliente, preco, quantidade, dataHora) "
+            . "VALUES ('$id', '$orcEsc', '$clienteEsc', '$preco', '$quantidade', NOW())"
+        );
+        $_SESSION['produto']['id_' . $id]['id'] = 0;
+        $_SESSION['produto']['id_' . $id]['quantidade'] = 0;
+        $_SESSION['produto']['id_' . $id]['preco'] = 0;
+    }
+    $salvo = true;
+}
 
-	    <!-- Page Specific Plugins -->
-	    <script src="js/tablesorter/jquery.tablesorter.js"></script>
-	    <script src="js/tablesorter/tables.js"></script>
+require __DIR__ . '/topo.php';
+?>
 
-	  </body>
-	</html>
+<div class="row">
+    <div class="col-lg-12">
+        <ol class="breadcrumb">
+            <li class="active"><i class="fa fa-dashboard"></i> Orçamento</li>
+        </ol>
+    </div>
+</div>
+
+<div class="col-lg-12">
+    <?php if ($salvo && $idOrcamento !== null): ?>
+        <div class="alert alert-dismissable alert-success">
+            <button type="button" class="close" data-dismiss="alert">&times;</button>
+            <strong>Feito!</strong> Orçamento salvo com sucesso (nº <?php echo (int) $idOrcamento; ?>).
+        </div>
+        <script>
+        (function () {
+            var width = 595, height = 421, left = 0, top = 0;
+            var url = 'orcamento_visualizar.php?idOrcamento=<?php echo (int) $idOrcamento; ?>';
+            window.open(url, 'janela', 'width=' + width + ', height=' + height + ', top=' + top + ', left=' + left + ', scrollbars=yes, status=no, toolbar=no, location=no, directories=no, menubar=no, resizable=no, fullscreen=no');
+        })();
+        </script>
+    <?php else: ?>
+        <div class="alert alert-warning">
+            Não foi possível salvar o orçamento. Selecione um cliente e adicione produtos ao carrinho.
+            <a href="carrinho.php" class="alert-link">Voltar ao carrinho</a>
+        </div>
+    <?php endif; ?>
+</div>
+
+</div><!-- /#page-wrapper -->
+
+<script src="js/jquery-1.10.2.js"></script>
+<script src="js/bootstrap.js"></script>
+</body>
+</html>

@@ -1,6 +1,4 @@
-<?php require("topo.php");
-require ("functions.php");
-?>
+<?php require("topo.php"); ?>
 
         <div class="row">
           <div class="col-lg-12">
@@ -33,24 +31,17 @@ require ("functions.php");
             </div><!-- /.row -->
 
 <?php
-$mes_atual=date('m');
-
-$qr=mysql_query("SELECT SUM(valor) as total FROM `contas_pagar` WHERE data BETWEEN ('2015-$mes_atual-01') AND ('2015-$mes_atual-31')");
-$row=mysql_fetch_array($qr);
-$saidas_mes=$row['total'];
-
+require_once __DIR__ . '/functions.php';
+$mes_atual = date('m');
+$qr = mysql_query("SELECT SUM(valor) as total FROM `contas_pagar` WHERE data BETWEEN ('2015-$mes_atual-01') AND ('2015-$mes_atual-31')");
+$row = mysql_fetch_array($qr);
+$saidas_mes = $row['total'] ?? 0;
 ?>
-         
+
     </div><!-- /#wrapper -->
 
-    <!-- JavaScript -->
-    <script src="js/jquery-1.10.2.js"></script>
-    <script src="js/bootstrap.js"></script>
-
-    <!-- Page Specific Plugins -->
     <script src="js/tablesorter/jquery.tablesorter.js"></script>
     <script src="js/tablesorter/tables.js"></script>
-
 
   </body>
 </html>

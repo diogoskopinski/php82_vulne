@@ -11,7 +11,7 @@ Ambiente isolado para estudo de segurança do projeto [bbroger/sistema-vendas](h
 | PHP | **8.2.27** (`php:8.2.27-apache-bookworm`) — linha 8.2 anterior a abril/2026 |
 | Apache | mod_rewrite habilitado |
 | MySQL | 8.0 com `ft_min_word_len=2` |
-| Compat | Shim [dshafik/php-mysql](https://github.com/dshafik/php-mysql) em `/usr/local/lib/php/mysql-shim.php` |
+| Compat | `docker/php/mysql-shim.php` (mysql_* → mysqli), copiado para `/usr/local/lib/php/mysql-shim.php` na imagem |
 
 ## Subir o ambiente
 

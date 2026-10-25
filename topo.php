@@ -1,4 +1,14 @@
 <?php
+$appBase = '/';
+if (!empty($_SERVER['SCRIPT_NAME'])) {
+    $scriptDir = str_replace('\\', '/', dirname($_SERVER['SCRIPT_NAME']));
+    if ($scriptDir !== '/' && $scriptDir !== '.') {
+        $appBase = rtrim(preg_replace('#/(produto|cliente|financeiro)(/.*)?$#', '', $scriptDir), '/') . '/';
+        if ($appBase === '/') {
+            $appBase = '/';
+        }
+    }
+}
 //require_once 'conexao/config.php';
 
 //require('Config.inc.php');
@@ -19,38 +29,23 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 
     <head>
-        <base href="/" />
+        <base href="<?php echo htmlspecialchars($appBase, ENT_QUOTES, 'UTF-8'); ?>" />
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 
         <title>Catálogo de peças - BL Auto Peças</title>
 
         <!-- Bootstrap core CSS -->
-        <link href="css/bootstrap.css" rel="stylesheet">
-            <link href="css/AdminLTE.css" rel="stylesheet">
-                <link href="css/lightbox.css" rel="stylesheet">
-                    <link rel="stylesheet" type="text/css" href="css/sweetalert.css">
-                        <link rel="stylesheet" type="text/css" href="css/example.css.css">
-                            <!-- Add custom CSS here -->
-                            <link href="css/sb-admin.css" rel="stylesheet">
-                                <!-- Color Box -->
-                                <link rel="stylesheet" href="css/colorbox.css" />
-                                <link rel="stylesheet" href="css/bootstrap-select.css">
-                                    <link rel="stylesheet" href="css/skin-red.min.css">
+            <link href="css/bootstrap.css" rel="stylesheet">
+            <link href="css/lightbox.css" rel="stylesheet">
+            <link href="css/sb-admin.css" rel="stylesheet">
+            <link rel="stylesheet" href="css/colorbox.css" />
+            <link rel="stylesheet" href="css/bootstrap-select.css">
                                     <style type="text/css">
                                         @media print {
                                             .noprint { display: none; }
                                         }
                                     </style>
 
-                                    <!-- Botao pesquisa -->
-                                    <script language="JavaScript" src="js/shortcut.js"></script>
-                                    <script>
-                                        shortcut.add("F9", function ()
-                                        {
-                                            document.consulta.consulta.focus();
-                                        });
-                                    </script>
-                                    <!-- Final botao pesquisa-->
                                     </head>
 
                                     <body >
@@ -67,17 +62,17 @@
                                                         <li class="dropdown">
                                                             <a href="#" class="dropdown-toggle" data-toggle="dropdown">Produtos <b class="caret"></b></a>
                                                             <ul class="dropdown-menu">
-                                                                <li><a href="produto/">Lista Produtos</a></li>
-                                                                <li><a href="produto/adicionar">Adicionar Produto</a></li>
+                                                                <li><a href="produto/index.php">Lista Produtos</a></li>
+                                                                <li><a href="produto/adicionar.php">Adicionar Produto</a></li>
 
                                                             </ul>
                                                         </li>
-                                                        <li><a href="carrinho">Carrinho</a></li>
+                                                        <li><a href="carrinho.php">Carrinho</a></li>
                                                         <li class="dropdown">
                                                             <a href="#" class="dropdown-toggle" data-toggle="dropdown">Clientes <b class="caret"></b></a>
                                                             <ul class="dropdown-menu">
-                                                                <li><a href="cliente">Gerenciar clientes</a></li>
-                                                                <li><a href="cliente/adicionar">Adicionar Cliente</a></li>
+                                                                <li><a href="cliente/index.php">Gerenciar clientes</a></li>
+                                                                <li><a href="cliente/adicionar.php">Adicionar Cliente</a></li>
                                                             </ul>
                                                         </li>
                                                         <li class="dropdown">
@@ -111,6 +106,14 @@
                                             </div>
                                         </div>
 
+                                        <script src="js/jquery-1.10.2.js"></script>
+                                        <script src="js/bootstrap.js"></script>
+                                        <script>
+                                        $(function () {
+                                            $('.dropdown-toggle').dropdown();
+                                        });
+                                        </script>
+
                                         <!--/.navbar-collapse -->
                                         <!-- <li class="dropdown user-dropdown">
                                            <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="fa fa-user"></i> John Smith <b class="caret"></b></a>
@@ -127,4 +130,4 @@
                                         --><!-- /.navbar-collapse -->
                                         </nav>
 
-                                        <div id="page-wrapper">
+                                        <div id="page-wrapper" style="margin-top:60px;padding:15px;">

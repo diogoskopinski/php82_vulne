@@ -180,7 +180,10 @@ class Cliente {
             $dados = $stm->fetchAll(PDO::FETCH_OBJ);
             return $dados;
         } catch (PDOException $erro) {
-            echo "<script>alert('Erro na linha: {$erro->getLine()}')</script>";
+            echo '<div class="alert alert-danger">Erro ao listar clientes: '
+                . htmlspecialchars($erro->getMessage(), ENT_QUOTES, 'UTF-8') . '</div>';
+
+            return [];
         }
     }
 

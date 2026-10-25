@@ -256,28 +256,40 @@ Class Produto {
     }
 
     public function getAllProdutos($inicio, $porpagina) {
+        if (!$this->conn) {
+            return [];
+        }
         try {
-            $this->inicio = $inicio;
-            $this->porpagina = $porpagina;
-            $sql = "SELECT * FROM produtos ORDER by produto,descricao DESC LIMIT $this->inicio,$this->porpagina";
+            $offset = max(0, (int) $inicio);
+            $limit = max(1, (int) $porpagina);
+            $sql = "SELECT * FROM produtos ORDER BY produto, descricao DESC LIMIT {$offset}, {$limit}";
             $stm = $this->conn->prepare($sql);
             $stm->execute();
-            $dados = $stm->fetchAll(PDO::FETCH_OBJ);
-            return $dados;
+
+            return $stm->fetchAll(PDO::FETCH_OBJ) ?: [];
         } catch (PDOException $erro) {
-            echo "<script>alert('Erro na linha: {$erro->getLine()}')</script>";
+            echo '<div class="alert alert-danger">Erro ao listar produtos: '
+                . htmlspecialchars($erro->getMessage(), ENT_QUOTES, 'UTF-8') . '</div>';
+
+            return [];
         }
     }
 
     public function getTotalProdutos() {
+        if (!$this->conn) {
+            return 0;
+        }
         try {
-            $sql = "SELECT COUNT(*) AS total FROM produtos";
+            $sql = 'SELECT COUNT(*) AS total FROM produtos';
             $stm = $this->conn->prepare($sql);
             $stm->execute();
-            $numeroResultados = $stm->fetchColumn();
-            return $numeroResultados;
+
+            return (int) $stm->fetchColumn();
         } catch (PDOException $erro) {
-            echo "<script>alert('Erro na linha: {$erro->getLine()}')</script>";
+            echo '<div class="alert alert-danger">Erro ao contar produtos: '
+                . htmlspecialchars($erro->getMessage(), ENT_QUOTES, 'UTF-8') . '</div>';
+
+            return 0;
         }
     }
 

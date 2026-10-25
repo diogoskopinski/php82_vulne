@@ -1,5 +1,7 @@
 <?php
 
+require_once __DIR__ . '/bootstrap.php';
+
 // CONFIGRAÇÕES DO SITE ####################
 //define('HOST', 'localhost');
 //define('USER', 'root');

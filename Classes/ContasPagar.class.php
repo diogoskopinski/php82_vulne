@@ -67,39 +67,30 @@ class ContasPagar {
         $this->status = $status;
     }
 
-    function getHoje() { 
+    function getHoje()
+    {
         echo date('d/m/Y');
     }
 
-    function getNomeMes($mes) {
-        $this->getNomeMes = $mes;
-        switch ($this->getNomeMes) {
-            case 01: case 1: $this->getNomeMes = "Janeiro";
-                break;
-            case 02: case 2: $this->getNomeMes = "Fevereiro";
-                break;
-            case 03: case 3: $this->getNomeMes = "Mar&ccedil;o";
-                break;
-            case 04: case 4: $this->getNomeMes = "Abril";
-                break;
-            case 05: case 5: $this->getNomeMes = "Maio";
-                break;
-            case 06: case 6: $this->getNomeMes = "Junho";
-                break;
-            case 07: case 7: $this->getNomeMes = "Julho";
-                break;
-            case 08: case 8: $this->getNomeMes = "Agosto";
-                break;
-            case 09: case 9: $this->getNomeMes = "Setembro";
-                break;
-            case 10: $this->getNomeMes = "Outubro";
-                break;
-            case 11: $this->getNomeMes = "Novembro";
-                break;
-            case 12: $this->getNomeMes = "Dezembro";
-                break;
-        }
-        return $this->getNomeMes;
+    function getNomeMes($mes)
+    {
+        $mes = (int) $mes;
+        $nomes = [
+            1 => 'Janeiro',
+            2 => 'Fevereiro',
+            3 => 'Março',
+            4 => 'Abril',
+            5 => 'Maio',
+            6 => 'Junho',
+            7 => 'Julho',
+            8 => 'Agosto',
+            9 => 'Setembro',
+            10 => 'Outubro',
+            11 => 'Novembro',
+            12 => 'Dezembro',
+        ];
+
+        return $nomes[$mes] ?? (string) $mes;
     }
     
     function getMes() {
@@ -110,46 +101,87 @@ class ContasPagar {
         echo date('Y'); 
     }
 
-    public function contasPagarHoje() {
+    public function contasPagarHoje()
+    {
+        if (!$this->conn) {
+            return [];
+        }
 
         try {
-            $sql = "SELECT * FROM contas_pagar WHERE data LIKE {$this->getHoje()} ORDER BY fornecedor ASC";
+            $hoje = date('Y-m-d');
+            $sql = 'SELECT * FROM contas_pagar WHERE data = :hoje ORDER BY fornecedor ASC';
             $stm = $this->conn->prepare($sql);
+            $stm->bindValue(':hoje', $hoje);
             $stm->execute();
-            $dados = $stm->fetchAll(PDO::FETCH_OBJ);
-            return $dados;
+
+            return $stm->fetchAll(PDO::FETCH_OBJ) ?: [];
         } catch (PDOException $erro) {
-            echo "<script>alert('Erro na linha: {$erro->getLine()}')</script>";
+            echo '<div class="alert alert-danger">Erro ao listar boletos: '
+                . htmlspecialchars($erro->getMessage(), ENT_QUOTES, 'UTF-8') . '</div>';
+
+            return [];
         }
     }
 
-    function contasMes() {
+    public function totalContasHoje()
+    {
+        if (!$this->conn) {
+            return '0,00';
+        }
 
         try {
-            $sql = "SELECT SUM(valor) as total FROM `contas_pagar` WHERE data BETWEEN ('".date('Y')."-".date('m')."-01') AND ('".date('Y')."-".date('m')."-31')";
+            $hoje = date('Y-m-d');
+            $sql = 'SELECT SUM(CAST(REPLACE(valor, ",", ".") AS DECIMAL(12,2))) FROM contas_pagar WHERE data = :hoje';
             $stm = $this->conn->prepare($sql);
+            $stm->bindValue(':hoje', $hoje);
             $stm->execute();
-            $count = $stm->fetchColumn();
-            return $count;
-            
-            //setlocale(LC_MONETARY, 'pt_BR');
-            //echo money_format('%i', $number) . "\n";
-            
+            $total = $stm->fetchColumn();
+
+            return number_format((float) $total, 2, ',', '.');
         } catch (PDOException $erro) {
-            echo "<script>alert('Erro na linha: {$erro->getLine()}')</script>";
+            return '0,00';
         }
     }
-    
-    function contasProximoMes() {
+
+    function contasMes()
+    {
+        if (!$this->conn) {
+            return '0,00';
+        }
 
         try {
-            $sql = "SELECT SUM(valor) as total FROM `contas_pagar` WHERE data BETWEEN ('".date('Y')."-".date('m', strtotime('+1 months'))."-01') AND ('".date('Y')."-".date('m', strtotime('+1 months'))."-31')";
+            $inicio = date('Y-m-01');
+            $fim = date('Y-m-t');
+            $sql = 'SELECT SUM(CAST(REPLACE(valor, ",", ".") AS DECIMAL(12,2))) FROM contas_pagar WHERE data BETWEEN :inicio AND :fim';
             $stm = $this->conn->prepare($sql);
+            $stm->bindValue(':inicio', $inicio);
+            $stm->bindValue(':fim', $fim);
             $stm->execute();
-            $count = $stm->fetchColumn();
-            return $count;
+
+            return number_format((float) $stm->fetchColumn(), 2, ',', '.');
         } catch (PDOException $erro) {
-            echo "<script>alert('Erro na linha: {$erro->getLine()}')</script>";
+            return '0,00';
+        }
+    }
+
+    function contasProximoMes()
+    {
+        if (!$this->conn) {
+            return '0,00';
+        }
+
+        try {
+            $inicio = date('Y-m-01', strtotime('+1 month'));
+            $fim = date('Y-m-t', strtotime('+1 month'));
+            $sql = 'SELECT SUM(CAST(REPLACE(valor, ",", ".") AS DECIMAL(12,2))) FROM contas_pagar WHERE data BETWEEN :inicio AND :fim';
+            $stm = $this->conn->prepare($sql);
+            $stm->bindValue(':inicio', $inicio);
+            $stm->bindValue(':fim', $fim);
+            $stm->execute();
+
+            return number_format((float) $stm->fetchColumn(), 2, ',', '.');
+        } catch (PDOException $erro) {
+            return '0,00';
         }
     }
 

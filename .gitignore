@@ -1,4 +1,6 @@
 fotos/*
+!fotos/.gitkeep
 .env
 /conexao/credentials.php
+php-vulne-deploy.zip
 
