@@ -19,7 +19,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 
     <head>
-        <base href="http://127.0.0.1/catalogo/" />
+        <base href="/" />
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 
         <title>Catálogo de peças - BL Auto Peças</title>

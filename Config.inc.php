@@ -10,8 +10,9 @@
 //define('ROOT', dirname(__DIR__));
 
 // AUTO LOAD DE CLASSES ####################
-function __autoload($classe)
-{
-    //busca dentro da pasta classes a classe necessaria...
-    include_once "Classes/{$classe}.class.php";
-}
+spl_autoload_register(function ($classe) {
+    $path = __DIR__ . "/Classes/{$classe}.class.php";
+    if (is_file($path)) {
+        include_once $path;
+    }
+});

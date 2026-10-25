@@ -33,3 +33,4 @@ Editar arquivos conexao/config.php e processa.php inserindo as informações do 
 
 Importar banco de dados que está dentro da pasta conexao.
 # php82_vulne
+# php82_vulne

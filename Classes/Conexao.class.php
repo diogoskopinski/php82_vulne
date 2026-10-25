@@ -2,10 +2,18 @@
 
 class Conexao {
 
-    private $host = "localhost";
-    private $db_name = "catalogo";
-    private $username = "root";
-    private $password = getEncryptedPass(9ef20ec6832a9c4adfb35c2ae1d86f85);
+    private $host;
+    private $db_name;
+    private $username;
+    private $password;
+
+    public function __construct()
+    {
+        $this->host = getenv('DB_HOST') ?: 'localhost';
+        $this->db_name = getenv('DB_NAME') ?: 'catalogo';
+        $this->username = getenv('DB_USER') ?: 'root';
+        $this->password = getenv('DB_PASSWORD') ?: 'bolacha';
+    }
     public $conn;
 
     // get the database connection

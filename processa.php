@@ -11,10 +11,17 @@
 		//private $senha = 'branco@sidnei';
 		//private $login = 'blautopeca_1';
 		//private $hostname = 'dbmy0051.whservidor.com';
-		private $banco = 'catalogo';
-		private $senha = 'bolacha';
-		private $login = 'root';
-		private $hostname = 'localhost';
+		private $banco;
+		private $senha;
+		private $login;
+		private $hostname;
+
+		function __construct(){
+			$this->banco = getenv('DB_NAME') ?: 'catalogo';
+			$this->senha = getenv('DB_PASSWORD') ?: 'bolacha';
+			$this->login = getenv('DB_USER') ?: 'root';
+			$this->hostname = getenv('DB_HOST') ?: 'localhost';
+		}
 
 		//CONEXAO
 		function conexao(){

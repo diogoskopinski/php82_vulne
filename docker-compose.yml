@@ -1,0 +1,50 @@
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: sistema-vendas-web
+    ports:
+      - "${HTTP_PORT:-8080}:80"
+    volumes:
+      - .:/var/www/html
+    environment:
+      DB_HOST: db
+      DB_USER: ${DB_USER:-sistema}
+      DB_PASSWORD: ${DB_PASSWORD:-sistema_pass}
+      DB_NAME: ${DB_NAME:-catalogo}
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - lab
+
+  db:
+    image: mysql:8.0
+    container_name: sistema-vendas-db
+    ports:
+      - "${MYSQL_PORT:-3306}:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root_pass}
+      MYSQL_DATABASE: ${DB_NAME:-catalogo}
+      MYSQL_USER: ${DB_USER:-sistema}
+      MYSQL_PASSWORD: ${DB_PASSWORD:-sistema_pass}
+    volumes:
+      - ./conexao/bancos.sql:/docker-entrypoint-initdb.d/01-bancos.sql:ro
+      - ./docker/mysql/my.cnf:/etc/mysql/conf.d/lab.cnf:ro
+      - db_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -uroot -p$$MYSQL_ROOT_PASSWORD || exit 1"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+      start_period: 40s
+    networks:
+      - lab
+
+volumes:
+  db_data:
+
+networks:
+  lab:
+    driver: bridge

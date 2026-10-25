@@ -1,2 +1,4 @@
 fotos/*
+.env
+/conexao/credentials.php
 
