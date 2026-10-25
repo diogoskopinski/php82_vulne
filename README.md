@@ -32,3 +32,4 @@ Instalar servidor web (Apache, PHP & Mysql).
 Editar arquivos conexao/config.php e processa.php inserindo as informações do banco de dados.
 
 Importar banco de dados que está dentro da pasta conexao.
+# php82_vulne
